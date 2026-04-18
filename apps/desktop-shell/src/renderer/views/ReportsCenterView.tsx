@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Badge, Button } from '@rangeos/ui';
+import { useReportingStore } from '../store/ReportingStore';
 import { 
   FileText, 
   Search, 
@@ -14,39 +15,15 @@ import {
   FileSignature
 } from 'lucide-react';
 
-const MOCK_REPORTS = [
-  {
-    id: 1,
-    title: "Post-Incident Analysis: Subnet B Breach",
-    type: "INCIDENT",
-    status: "FINALIZED",
-    author: "ROOT_ADMIN",
-    version: "1.2.0",
-    date: "2026-04-18"
-  },
-  {
-    id: 2,
-    title: "Quarterly Pentest: Finance Segment",
-    type: "PENTEST",
-    status: "DRAFT",
-    author: "SEC_ENG_01",
-    version: "0.8.4",
-    date: "2026-04-15"
-  },
-  {
-    id: 3,
-    title: "Forensic Analysis: Seized Workstation #42",
-    type: "FORENSIC",
-    status: "FINALIZED",
-    author: "ROOT_ADMIN",
-    version: "1.0.0",
-    date: "2026-04-12"
-  }
-];
-
 export default function ReportsCenterView() {
-  const [selectedReportId, setSelectedReportId] = useState<number>(1);
-  const activeReport = MOCK_REPORTS.find(r => r.id === selectedReportId) || MOCK_REPORTS[0];
+  const { reports, selectedReportId, selectReport, finalizeReport } = useReportingStore();
+  const activeReport = reports.find(r => r.id === selectedReportId) || reports[0];
+
+  const handleFinalize = (id: string) => {
+    if (confirm("FINALIZING this report will establish a permanent audit freeze. Proceed?")) {
+        finalizeReport(id);
+    }
+  };
 
   return (
     <div className="flex h-full max-w-[1600px] mx-auto overflow-hidden gap-6 p-2">
@@ -74,10 +51,10 @@ export default function ReportsCenterView() {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-          {MOCK_REPORTS.map(report => (
+          {reports.map(report => (
             <div 
               key={report.id}
-              onClick={() => setSelectedReportId(report.id)}
+              onClick={() => selectReport(report.id)}
               className={`p-4 rounded-xl border transition-all cursor-pointer group ${
                 selectedReportId === report.id 
                   ? 'bg-cyber-primary/10 border-cyber-primary shadow-glow-primary/20' 
@@ -91,7 +68,7 @@ export default function ReportsCenterView() {
                  <span className="text-[9px] font-mono text-gray-500 uppercase">{report.date}</span>
               </div>
               <h3 className={`text-sm font-mono font-bold uppercase tracking-tight line-clamp-2 mb-3 ${
-                 selectedReportId === report.id ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'
+                selectedReportId === report.id ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'
               }`}>
                  {report.title}
               </h3>
@@ -126,11 +103,13 @@ export default function ReportsCenterView() {
               <Button variant="ghost" size="sm" className="px-2">
                  <History size={16} />
               </Button>
-              <Button variant="ghost" size="sm" className="px-2 text-cyber-primary">
-                 <FileSignature size={16} className="mr-2" /> Sign
-              </Button>
-              <Button variant="primary" size="sm" className="px-4">
-                 <Download size={16} className="mr-2" /> Export
+              {activeReport.status !== 'FINALIZED' && (
+                  <Button variant="ghost" size="sm" className="px-2 text-cyber-primary" onClick={() => handleFinalize(activeReport.id)}>
+                    <FileSignature size={16} className="mr-2" /> Sign & Finalize
+                  </Button>
+              )}
+              <Button variant="primary" size="sm" className="px-4 bg-cyber-primary text-black hover:bg-white shadow-glow-primary">
+                 <Download size={16} className="mr-2" /> Export PDF
               </Button>
            </div>
         </div>
