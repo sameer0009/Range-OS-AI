@@ -2,6 +2,8 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainShell from './layouts/MainShell';
 import SplashScreen from './views/SplashScreen';
 import DashboardView from './views/DashboardView';
+import LoginScreen from './views/LoginScreen';
+
 
 // Placeholders for views
 const PlaceholderView = ({ title }: { title: string }) => (
@@ -18,8 +20,10 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path="/" element={<SplashScreen />} />
+        <Route path="/login" element={<LoginScreen />} />
         
         <Route path="/shell" element={<MainShell />}>
+
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardView />} />
           <Route path="lab-builder" element={<PlaceholderView title="Lab Builder" />} />

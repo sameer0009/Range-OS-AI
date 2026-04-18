@@ -12,7 +12,7 @@ export default function SplashScreen() {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => navigate('/shell'), 500); // Route to shell when complete
+          setTimeout(() => navigate('/login'), 500); // Route to login when complete
           return 100;
         }
         return prev + Math.floor(Math.random() * 15) + 5;
