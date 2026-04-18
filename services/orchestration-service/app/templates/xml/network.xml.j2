@@ -1,0 +1,19 @@
+<network>
+  <name>{{ name }}</name>
+  <uuid>{{ uuid }}</uuid>
+  <bridge name='{{ bridge_name }}' stp='on' delay='0'/>
+  
+  {% if forward_mode == 'nat' %}
+  <forward mode='nat'/>
+  {% else %}
+  <!-- Isolated Mode -->
+  {% endif %}
+
+  <ip address='{{ gateway_ip }}' netmask='{{ netmask }}'>
+    {% if dhcp_enabled %}
+    <dhcp>
+      <range start='{{ dhcp_start }}' end='{{ dhcp_end }}'/>
+    </dhcp>
+    {% endif %}
+  </ip>
+</network>
