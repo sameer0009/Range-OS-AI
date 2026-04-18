@@ -1,32 +1,39 @@
-# RangeOS AI - Tiered Package Registry
+# RangeOS AI - Core OS & GUI Tier
+# Strategy: Wayland-Native Tactical HUD
 
-# Core GUI & Branding
-kde-plasma-desktop
+# GUI Foundation
+plasma-desktop
 sddm
+kwin-wayland
+wayland-protocols
+xwayland
 plasma-nm
 plasma-pa
 kvantum
 latte-dock
+fonts-inter
+fonts-roboto-mono
+
+# System Runtimes
+nodejs
+npm
+python3.12
+python3-pip
+python3-venv
+postgresql-client
+redis-tools
 
 # Virtualization Foundation
+qemu-system-x86
 qemu-kvm
 libvirt-daemon-system
 libvirt-clients
 bridge-utils
+ovmf
 virt-manager
 
-# Investigative Toolkit
-sleuthkit
-wireshark
-autopsy
-volatility3
-hashdeep
-nmap
-tcpdump
-
-# RangeOS Runtimes
-nodejs
-npm
-python3-pip
-postgresql-client
-redis-tools
+# Base Identity
+plymouth
+plymouth-theme-spinner
+grub-common
+grub-pc-bin

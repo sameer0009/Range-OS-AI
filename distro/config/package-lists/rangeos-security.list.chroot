@@ -1,0 +1,16 @@
+# RangeOS AI - Security & Networking Tier
+
+# Packet Capture & Analysis
+wireshark
+tshark
+tcpdump
+termshark
+
+# Network Discovery
+nmap
+
+# Traffic Control
+nftables
+iptables-persistent
+openvpn
+wireguard

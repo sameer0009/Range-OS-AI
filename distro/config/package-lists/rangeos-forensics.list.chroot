@@ -1,0 +1,20 @@
+# RangeOS AI - Forensics & Analysis Tier
+
+# Bit-stream & File System
+sleuthkit
+guymager
+bulk-extractor
+foremost
+
+# Memory Forensics
+volatility3
+
+# Integrity & Intelligence
+hashdeep
+yara
+chkrootkit
+rkhunter
+
+# Documentation Dependencies
+pandoc
+wkhtmltopdf
