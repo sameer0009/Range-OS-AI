@@ -1,0 +1,24 @@
+#!/bin/bash
+# RangeOS AI - Tactical Session Wrapper
+# Orchestrates the transition from login to HUD
+
+set -e
+
+# 1. Environment Setup
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=KDE
+export WAYLAND_DISPLAY=wayland-0
+
+echo "[*] Initializing Tactical Forge Session..."
+
+# 2. Start KDE Plasma Core (Backdrop)
+# /usr/bin/startplasma-wayland &
+
+# 3. Wait for Hardware Layer
+sleep 2
+
+# 4. Launch Desktop Shell (Tactical HUD)
+# cd /opt/rangeos/apps/desktop-shell
+# npm start -- --fullscreen
+
+echo "[+] Tactical HUD Engaged."

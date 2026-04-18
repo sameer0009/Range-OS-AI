@@ -1,0 +1,32 @@
+#!/bin/bash
+# RangeOS AI - Health Status Provider
+# Polls critical services and writes status for the SDDM greeter
+
+HEALTH_FILE="/var/lib/sddm/rangeos_health.json"
+
+check_service() {
+    if systemctl is-active --quiet "$1"; then
+        echo "online"
+    else
+        echo "offline"
+    fi
+}
+
+while true; do
+  GATEWAY=$(check_service rangeos-gateway)
+  FORENSICS=$(check_service rangeos-forensics)
+  ORCH=$(check_service rangeos-orchestration)
+
+  cat > "$HEALTH_FILE" <<EOF
+{
+  "timestamp": "$(date -Iseconds)",
+  "services": {
+    "gateway": "$GATEWAY",
+    "forensics": "$FORENSICS",
+    "orchestration": "$ORCH"
+  }
+}
+EOF
+
+  sleep 30
+done

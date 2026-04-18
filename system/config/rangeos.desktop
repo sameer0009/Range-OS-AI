@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=RangeOS AI (Tactical HUD)
+Comment=High-Fidelity Cyber Operations Workspace
+Exec=/opt/rangeos/bin/rangeos-session-wrapper
+Type=Application
+DesktopNames=KDE
+X-KDE-PluginInfo-Name=rangeos
