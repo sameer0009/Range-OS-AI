@@ -6,6 +6,7 @@ import LoginScreen from './views/LoginScreen';
 import LabBuilderView from './views/LabBuilderView';
 import TopologyView from './views/TopologyView';
 import AIAssistantView from './views/AIAssistantView';
+import ForensicsView from './views/ForensicsView';
 
 
 // Placeholders for views
@@ -33,7 +34,7 @@ function App() {
           <Route path="topology" element={<TopologyView />} />
           <Route path="red-workspace" element={<PlaceholderView title="Offensive Security (Red Team)" />} />
           <Route path="blue-workspace" element={<PlaceholderView title="Defensive Security (Blue Team)" />} />
-          <Route path="forensics" element={<PlaceholderView title="Forensics & Investigation" />} />
+          <Route path="forensics" element={<ForensicsView />} />
           <Route path="ai-assistant" element={<AIAssistantView />} />
           <Route path="reports" element={<PlaceholderView title="Reports Center" />} />
           <Route path="policies" element={<PlaceholderView title="Policy Console" />} />
