@@ -1,0 +1,23 @@
+[Colors:Button]
+BackgroundNormal=13,20,38
+ForegroundNormal=226,232,240
+[Colors:Selection]
+BackgroundNormal=59,130,246
+ForegroundNormal=255,255,255
+[Colors:View]
+BackgroundNormal=10,15,30
+ForegroundNormal=226,232,240
+ForegroundInactive=100,116,139
+[Colors:Window]
+BackgroundNormal=2,6,23
+ForegroundNormal=226,232,240
+[Colors:Tooltip]
+BackgroundNormal=15,23,42
+ForegroundNormal=148,163,184
+[General]
+AccentColor=#3b82f6
+ColorScheme=RangeOS-Obsidian
+Name=RangeOS Obsidian
+[KDE]
+LookAndFeelPackage=rangeos
+widgetStyle=kvantum-dark

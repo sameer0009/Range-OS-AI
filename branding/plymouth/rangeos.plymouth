@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=RangeOS AI
+Description=RangeOS AI Tactical Boot Splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/rangeos
+ScriptFile=/usr/share/plymouth/themes/rangeos/rangeos.script

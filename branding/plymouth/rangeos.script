@@ -1,0 +1,41 @@
+// RangeOS AI — Plymouth Boot Script
+// Renders: logo centered + progress bar at bottom
+
+logo_image = Image("logo.png");
+logo_sprite = Sprite(logo_image);
+logo_sprite.SetX(Window.GetWidth()  / 2 - logo_image.GetWidth()  / 2);
+logo_sprite.SetY(Window.GetHeight() / 2 - logo_image.GetHeight() / 2 - 40);
+logo_sprite.SetOpacity(1);
+
+// Progress bar background
+bar_bg_image = Image.CreateFilledCircle(1, 4, 0x0f172a, 1);
+bar_bg = Sprite();
+bar_bg.SetImage(ShadedImage());
+
+progress_bar_width = 320;
+progress_bar_height = 4;
+bar_x = Window.GetWidth()  / 2 - progress_bar_width / 2;
+bar_y = Window.GetHeight() / 2 + logo_image.GetHeight() / 2 + 20;
+
+// Background track
+track = Sprite(Image.CreateSolid(progress_bar_width, progress_bar_height, 0x1e3a5f, 1));
+track.SetX(bar_x);
+track.SetY(bar_y);
+
+// Active fill
+progress = Sprite();
+progress.SetX(bar_x);
+progress.SetY(bar_y);
+
+fun BootProgressCb(time, progress_val) {
+    filled_width = Math.Int(progress_val * progress_bar_width);
+    if (filled_width < 2) filled_width = 2;
+    progress.SetImage(Image.CreateSolid(filled_width, progress_bar_height, 0x3b82f6, 1));
+}
+
+Plymouth.SetBootProgressFunction(BootProgressCb);
+
+// Tagline
+tagline = Sprite(Image.Text("RANGEOS AI  |  TACTICAL OPERATIONS", 0.365, 0.505, 0.965, 1, "JetBrains Mono 9"));
+tagline.SetX(Window.GetWidth() / 2 - tagline.GetImage().GetWidth() / 2);
+tagline.SetY(bar_y + 14);

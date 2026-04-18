@@ -1,0 +1,12 @@
+NAME="RangeOS AI"
+VERSION="0.2.31-Alpha (Noble)"
+ID=rangeos
+ID_LIKE=ubuntu
+PRETTY_NAME="RangeOS AI 0.2.31-Alpha"
+VERSION_ID="0.2.31"
+VERSION_CODENAME="noble"
+HOME_URL="https://rangeos.ai"
+SUPPORT_URL="https://github.com/sameer0009/Range-OS-AI"
+BUG_REPORT_URL="https://github.com/sameer0009/Range-OS-AI/issues"
+LOGO=rangeos
+ANSI_COLOR="1;34"
