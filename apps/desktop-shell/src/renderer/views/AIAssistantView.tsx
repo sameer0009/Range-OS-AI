@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
 import { Card, Badge, Button } from '@rangeos/ui';
+import { useAIAssistantStore } from '../store/AIAssistantStore';
 import { 
   Bot, 
   Send, 
@@ -11,73 +11,65 @@ import {
   ShieldCheck,
   User,
   Paperclip,
-  Trash2
+  Trash2,
+  Box
 } from 'lucide-react';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  suggestions?: any[];
-  timestamp: string;
-}
-
-const AGENTS = [
-  { id: 'tutor', name: 'Range Tutor', icon: <Bot size={16} /> },
-  { id: 'architect', name: 'Lab Architect', icon: <ShieldCheck size={16} /> },
-  { id: 'analyst', name: 'Forensic Analyst', icon: <Database size={16} /> },
-  { id: 'writer', name: 'Report Writer', icon: <FileText size={16} /> },
-];
-
 export default function AIAssistantView() {
-  const [activeAgent, setActiveAgent] = useState('analyst');
-  const [messages, setMessages] = useState<Message[]>([
-    { 
-      id: '1', 
-      role: 'assistant', 
-      content: 'Neural Link established. I am ready to analyze system telemetry or assist with mission strategy. How can I help today?', 
-      timestamp: '19:21' 
-    }
-  ]);
+  const { 
+    messages, 
+    activePersonaId, 
+    activeMissionId, 
+    isThinking, 
+    setPersona, 
+    addMessage, 
+    setThinking, 
+    clearHistory,
+    setMission
+  } = useAIAssistantStore();
+  
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isThinking]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMsg: Message = {
+    const userMsg = {
       id: Date.now().toString(),
-      role: 'user',
+      role: 'user' as const,
       content: input,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    addMessage(userMsg);
     setInput('');
-    setIsTyping(true);
+    setThinking(true);
 
-    // Mock API Call Simulation
-    setTimeout(() => {
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `Intelligence synthesized for agent profile: ${activeAgent.toUpperCase()}. I recommend auditing the current DC policy as unusual lateral movement has been detected in segment 10.0.1.0/24.`,
-        suggestions: [
-          { id: 's1', label: 'AUDIT DC POLICY', action: 'policy audit --target dc-01' },
-          { id: 's2', label: 'ISOLATE SEGMENT', action: 'network isolate 10.0.1.0/24' }
-        ],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prev => [...prev, assistantMsg]);
-      setIsTyping(false);
-    }, 1200);
+    try {
+        // Integration Logic: In real impl, this calls POST /v1/ai/chat
+        // const response = await fetch('/v1/ai/chat', { ... });
+        await new Promise(r => setTimeout(r, 1500)); 
+        
+        const assistantMsg = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant' as const,
+            content: `Grounded Intelligence analysis complete for Mission ${activeMissionId || 'OPERATOR_LOCAL'}. I have identified a critical reconnaissance path.`,
+            suggestions: [
+                { id: 's1', label: 'MAP TARGET NETWORK', action: 'nmap -sV 10.0.10.0/24' },
+                { id: 's2', label: 'HARVEST TELEMETRY', action: 'intel collect --last-30m' }
+            ],
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        addMessage(assistantMsg);
+    } finally {
+        setThinking(false);
+    }
   };
 
   return (
