@@ -3,6 +3,7 @@ import MainShell from './layouts/MainShell';
 import SplashScreen from './views/SplashScreen';
 import DashboardView from './views/DashboardView';
 import LoginScreen from './views/LoginScreen';
+import LabBuilderView from './views/LabBuilderView';
 
 
 // Placeholders for views
@@ -26,7 +27,7 @@ function App() {
 
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardView />} />
-          <Route path="lab-builder" element={<PlaceholderView title="Lab Builder" />} />
+          <Route path="lab-builder" element={<LabBuilderView />} />
           <Route path="topology" element={<PlaceholderView title="Network Topology" />} />
           <Route path="red-workspace" element={<PlaceholderView title="Offensive Security (Red Team)" />} />
           <Route path="blue-workspace" element={<PlaceholderView title="Defensive Security (Blue Team)" />} />
