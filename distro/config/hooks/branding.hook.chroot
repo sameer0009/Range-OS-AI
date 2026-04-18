@@ -1,0 +1,23 @@
+#!/bin/bash
+# RangeOS AI - Post-Install Branding Hook
+# Target: chroot environment
+
+set -e
+
+echo "[*] Applying RangeOS AI Tactical Identity..."
+
+# 1. Clear default plymouth themes and set RangeOS
+# plymouth-set-default-theme rangeos-pulse || true
+
+# 2. Update initramfs to include pulse-branding
+# update-initramfs -u
+
+# 3. Configure SDDM for tactical mode
+if [ -d /etc/sddm.conf.d ]; then
+    echo "[Theme]\nCurrent=rangeos-sddm" > /etc/sddm.conf.d/tactical.conf
+fi
+
+# 4. Patching fonts
+fc-cache -fv
+
+echo "[+] Tactical Identity Applied to OS Root."
