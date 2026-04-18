@@ -1,0 +1,16 @@
+[Unit]
+Description=RangeOS AI Policy Service
+PartOf=rangeos-core.target
+After=rangeos-core.target
+
+[Service]
+Type=simple
+User=range-operator
+WorkingDirectory=/opt/rangeos/services/policy-service
+ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002
+Restart=always
+RestartSec=3
+SyslogIdentifier=rangeos-policy
+
+[Install]
+WantedBy=rangeos-core.target

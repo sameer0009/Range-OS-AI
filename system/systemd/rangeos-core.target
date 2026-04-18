@@ -1,0 +1,8 @@
+[Unit]
+Description=RangeOS AI Core Microservice Mesh
+Requires=postgresql.service redis-server.service
+After=postgresql.service redis-server.service
+AllowIsolate=yes
+
+[Install]
+WantedBy=multi-user.target

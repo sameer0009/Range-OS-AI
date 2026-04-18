@@ -1,0 +1,17 @@
+[Unit]
+Description=RangeOS AI Desktop Shell (Tactical HUD)
+After=rangeos-gateway.service
+Requires=rangeos-gateway.service
+
+[Service]
+Type=simple
+User=range-operator
+Environment=DISPLAY=:0
+WorkingDirectory=/opt/rangeos/apps/desktop-shell
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=10
+SyslogIdentifier=rangeos-shell
+
+[Install]
+WantedBy=graphical-session.target
