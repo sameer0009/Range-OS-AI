@@ -4,6 +4,7 @@ import SplashScreen from './views/SplashScreen';
 import DashboardView from './views/DashboardView';
 import LoginScreen from './views/LoginScreen';
 import LabBuilderView from './views/LabBuilderView';
+import TopologyView from './views/TopologyView';
 
 
 // Placeholders for views
@@ -28,7 +29,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardView />} />
           <Route path="lab-builder" element={<LabBuilderView />} />
-          <Route path="topology" element={<PlaceholderView title="Network Topology" />} />
+          <Route path="topology" element={<TopologyView />} />
           <Route path="red-workspace" element={<PlaceholderView title="Offensive Security (Red Team)" />} />
           <Route path="blue-workspace" element={<PlaceholderView title="Defensive Security (Blue Team)" />} />
           <Route path="forensics" element={<PlaceholderView title="Forensics & Investigation" />} />
