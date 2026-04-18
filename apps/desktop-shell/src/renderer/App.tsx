@@ -11,6 +11,8 @@ import ReportsCenterView from './views/ReportsCenterView';
 import RedWorkspaceView from './views/RedWorkspaceView';
 import BlueWorkspaceView from './views/BlueWorkspaceView';
 import SettingsView from './views/SettingsView';
+import { OnboardingWizard } from './components/OnboardingWizard';
+import { useOnboardingStore } from './store/OnboardingStore';
 
 
 // Placeholders for views
@@ -24,8 +26,13 @@ const PlaceholderView = ({ title }: { title: string }) => (
 );
 
 function App() {
+  const { firstBoot } = useOnboardingStore();
+  const skipOnboarding = import.meta.env.VITE_SKIP_ONBOARDING === 'true';
+
   return (
     <HashRouter>
+      {/* First-Boot Guard: renders wizard before any routing */}
+      {firstBoot && !skipOnboarding && <OnboardingWizard />}
       <Routes>
         <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<LoginScreen />} />
