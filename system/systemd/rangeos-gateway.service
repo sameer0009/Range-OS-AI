@@ -1,0 +1,19 @@
+[Unit]
+Description=RangeOS AI API Gateway
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=range-operator
+WorkingDirectory=/opt/rangeos/services/api-gateway
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=8000
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=rangeos-gateway
+
+[Install]
+WantedBy=multi-user.target
