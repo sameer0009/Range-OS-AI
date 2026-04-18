@@ -20,8 +20,12 @@ class GeneratedLab(SQLModel, table=True):
     __tablename__ = "generated_labs"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     template_id: uuid.UUID = Field(foreign_key="lab_templates.id")
-    owner_id: uuid.UUID = Field(index=True) # Linked to User in identity-service
-    status: str = Field(default="Provisioning", max_length=50)
+    owner_id: uuid.UUID = Field(index=True)
+    
+    # State Machine Integration
+    status: str = Field(default="REQUESTED", max_length=50)
+    lifecycle_context: Dict = Field(default_factory=dict, sa_column=Column(JSON))
+    
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)})
 
