@@ -1,0 +1,7 @@
+[Unit]
+Description=RangeOS AI Session Control Target
+AllowIsolate=yes
+Wants=rangeos-shell.service
+
+[Install]
+WantedBy=default.target

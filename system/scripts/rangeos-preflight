@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+# RangeOS AI - Pre-flight Readiness Checker
+import socket
+import sys
+import time
+import argparse
+
+SERVICES = {
+    "PostgreSQL": ("127.0.0.1", 5432),
+    "Redis": ("127.0.0.1", 6379),
+    "Gateway": ("127.0.0.1", 8000),
+    "Identity": ("127.0.0.1", 8001)
+}
+
+def check_port(host, port, timeout=1):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(timeout)
+        try:
+            s.connect((host, port))
+            return True
+        except (socket.timeout, ConnectionRefusedError):
+            return False
+
+def main():
+    parser = argparse.ArgumentParser(description="RangeOS Pre-flight Readiness Checker")
+    parser.add_argument("--wait", type=int, default=10, help="Max wait time in seconds")
+    args = parser.parse_args()
+
+    start_time = time.time()
+    pending = list(SERVICES.keys())
+
+    print(f"[*] Initializing RangeOS Pre-flight Checks (Timeout: {args.wait}s)...")
+
+    while time.time() - start_time < args.wait:
+        for svc in pending[:]:
+            host, port = SERVICES[svc]
+            if check_port(host, port):
+                print(f"[+] Service {svc} is READY.")
+                pending.remove(svc)
+        
+        if not pending:
+            print("[!!!] MISSION REARED: All systems online.")
+            sys.exit(0)
+        
+        time.sleep(1)
+
+    print(f"[!] FAILED: The following systems are UNAVAILABLE: {', '.join(pending)}")
+    sys.exit(1)
+
+if __name__ == "__main__":
+    main()

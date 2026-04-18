@@ -1,0 +1,14 @@
+[Unit]
+Description=RangeOS AI Platform Recovery HUD
+Conflicts=rangeos-shell.service
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+WorkingDirectory=/opt/rangeos/apps/desktop-shell
+ExecStart=/usr/bin/npm start -- --recovery
+Restart=on-failure
+SyslogIdentifier=rangeos-recovery
+
+[Install]
+WantedBy=default.target

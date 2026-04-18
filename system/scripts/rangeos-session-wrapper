@@ -11,14 +11,13 @@ export WAYLAND_DISPLAY=wayland-0
 
 echo "[*] Initializing Tactical Forge Session..."
 
-# 2. Start KDE Plasma Core (Backdrop)
-# /usr/bin/startplasma-wayland &
+# 2. Perform Pre-Flight Intelligence Check
+if /opt/rangeos/bin/rangeos-preflight --wait=15; then
+    echo "[+] Health Check PASSED. Engaging Mission HUD..."
+    systemctl --user isolate rangeos-session.target
+else
+    echo "[!] Health Check FAILED. Engaging Recovery Mode..."
+    systemctl --user start rangeos-recovery.service
+fi
 
-# 3. Wait for Hardware Layer
-sleep 2
-
-# 4. Launch Desktop Shell (Tactical HUD)
-# cd /opt/rangeos/apps/desktop-shell
-# npm start -- --fullscreen
-
-echo "[+] Tactical HUD Engaged."
+echo "[+] Handing off supervision to systemd --user."

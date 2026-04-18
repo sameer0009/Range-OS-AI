@@ -1,0 +1,15 @@
+[Unit]
+Description=RangeOS AI High-Fidelity Tactical HUD
+After=rangeos-session.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+WorkingDirectory=/opt/rangeos/apps/desktop-shell
+ExecStart=/usr/bin/npm start -- --fullscreen
+Restart=always
+RestartSec=5
+SyslogIdentifier=rangeos-shell
+
+[Install]
+WantedBy=rangeos-session.target
