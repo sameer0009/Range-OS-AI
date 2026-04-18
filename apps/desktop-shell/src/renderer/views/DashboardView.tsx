@@ -7,6 +7,15 @@ import { EvidenceSummaryWidget } from '../components/widgets/EvidenceSummaryWidg
 import { getDashboardData, DashboardData } from '../api/mockData';
 import { Card } from '@rangeos/ui';
 
+// Import SVG assets
+import aiCoreIcon from '../assets/icons/ai-core.svg';
+import threatIntelIcon from '../assets/icons/threat-intel.svg';
+import pentestLabIcon from '../assets/icons/pentest-lab.svg';
+import networkMapperIcon from '../assets/icons/network-mapper.svg';
+import forensicsIcon from '../assets/icons/forensics.svg';
+import policyEngineIcon from '../assets/icons/policy-engine.svg';
+import secureBrowserIcon from '../assets/icons/secure-browser.svg';
+
 export default function DashboardView() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,27 +57,41 @@ export default function DashboardView() {
             <AlertConsoleWidget alerts={data.alerts} />
           </section>
 
-          {/* Asset Integration Card preserved but styled into the bento */}
-          <section className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 mb-4">
+          {/* Module Overview (Asset Integration) */}
+          <div className="space-y-4">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
                <span className="w-2 h-2 rounded-full bg-cyber-primary" /> Integrated Combat Modules
             </h2>
-            <Card className="p-0 overflow-hidden bg-cyber-surface/30 border-dashed border-cyber-surface-elevated">
-              <div className="flex flex-col md:flex-row items-center gap-8 p-6">
-                <img 
-                  src="../renderer/assets/module-grid.png" 
-                  alt="System Modules" 
-                  className="w-full max-w-sm h-auto opacity-70 hover:opacity-100 transition-opacity rounded-lg"
-                />
-                <div className="space-y-4 flex-1">
-                  <h3 className="text-lg font-mono font-bold text-white uppercase">Neural Link Status</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed font-mono">
-                    All range controllers are operating within predicted efficiency parameters. AI core is successfully intercepting 99.4% of synthetic red-team evasion attempts.
-                  </p>
-                </div>
+            <Card className="bg-cyber-surface/30 border-dashed border-cyber-surface-elevated">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 p-4">
+                {[
+                  { icon: aiCoreIcon, label: 'AI Core' },
+                  { icon: threatIntelIcon, label: 'Intelligence' },
+                  { icon: pentestLabIcon, label: 'Neural Forge' },
+                  { icon: networkMapperIcon, label: 'Topology' },
+                  { icon: forensicsIcon, label: 'Forensics' },
+                  { icon: policyEngineIcon, label: 'Policy' },
+                  { icon: secureBrowserIcon, label: 'Safe Link' },
+                ].map((mod, i) => (
+                  <div key={i} className="flex flex-col items-center gap-3 group cursor-pointer">
+                    <div 
+                      className="w-10 h-10 bg-cyber-primary group-hover:bg-white transition-all duration-300 shadow-glow-primary group-hover:shadow-glow-white"
+                      style={{
+                        maskImage: `url(${mod.icon})`,
+                        maskRepeat: 'no-repeat',
+                        maskPosition: 'center',
+                        maskSize: 'contain',
+                        WebkitMaskImage: `url(${mod.icon})`,
+                      }}
+                    />
+                    <span className="text-[10px] font-mono text-gray-500 group-hover:text-white transition-colors uppercase tracking-tighter text-center">
+                      {mod.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </Card>
-          </section>
+          </div>
         </div>
 
         {/* Sidebar Column */}
