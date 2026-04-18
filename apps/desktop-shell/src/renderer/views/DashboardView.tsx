@@ -1,159 +1,116 @@
-import { useState } from 'react';
-import { 
-  Box, 
-  Server, 
-  Shield, 
-  AlertTriangle, 
-  Activity, 
-  Zap,
-  Terminal,
-  Database
-} from 'lucide-react';
-import { 
-  Button, 
-  Badge, 
-  Card, 
-  Table, 
-  TopologyNode, 
-  Modal 
-} from '@rangeos/ui';
+import { useEffect, useState } from 'react';
+import { StatusHeader } from '../components/widgets/StatusHeader';
+import { LabGalleryWidget } from '../components/widgets/LabGalleryWidget';
+import { AlertConsoleWidget } from '../components/widgets/AlertConsoleWidget';
+import { AISuggestionWidget } from '../components/widgets/AISuggestionWidget';
+import { EvidenceSummaryWidget } from '../components/widgets/EvidenceSummaryWidget';
+import { getDashboardData, DashboardData } from '../api/mockData';
+import { Card } from '@rangeos/ui';
 
 export default function DashboardView() {
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const tableHeaders = ["Node ID", "Address", "Type", "Status", "Trust Zone"];
-  const tableRows = [
-    ["SRV-01", "10.0.1.5", "Server", <Badge variant="success">Active</Badge>, <Badge variant="ht">High Trust</Badge>],
-    ["WK-04", "10.0.1.12", "Workstation", <Badge variant="secondary">Idle</Badge>, <Badge variant="mt">Moderate</Badge>],
-    ["SQL-DB", "10.0.2.20", "Database", <Badge variant="success">Active</Badge>, <Badge variant="mt">Moderate</Badge>],
-    ["VPN-GW", "172.16.0.1", "Gateway", <Badge variant="alert" glow>Warning</Badge>, <Badge variant="lt">Low Trust</Badge>],
-    ["UNK-09", "10.0.1.99", "Unknown", <Badge variant="alert">Alert</Badge>, <Badge variant="qt" glow>Quarantined</Badge>],
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const dashboardData = await getDashboardData();
+      setData(dashboardData);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex flex-col items-center justify-center space-y-4 animate-pulse">
+        <div className="w-12 h-12 rounded-full border-2 border-cyber-primary border-t-transparent animate-spin" />
+        <p className="font-mono text-xs text-cyber-primary uppercase tracking-[0.3em]">Synching with AI Core...</p>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700 max-w-[1600px] mx-auto">
-      
-      {/* Header section */}
-      <header className="flex justify-between items-start">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-cyber-primary font-mono text-xs uppercase tracking-[0.3em]">
-            <Zap size={14} className="animate-pulse" /> Platform Operations
-          </div>
-          <h1 className="text-3xl font-mono font-bold text-white tracking-tight uppercase">Command Center</h1>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="ghost" onClick={() => setModalOpen(true)}>System Audit</Button>
-          <Button variant="primary">Generate Lab</Button>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-full max-w-[1600px] mx-auto p-2">
+      <StatusHeader />
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card title="Lab Instances" icon={<Box size={18} />} accent="primary">
-          <div className="flex items-end justify-between">
-            <div className="text-4xl font-mono font-bold text-cyber-primary">04</div>
-            <Badge variant="primary">+1 Active</Badge>
-          </div>
-        </Card>
-        <Card title="Security Alerts" icon={<AlertTriangle size={18} />} accent="alert">
-          <div className="flex items-end justify-between">
-            <div className="text-4xl font-mono font-bold text-cyber-alert">12</div>
-            <Badge variant="alert" glow>Critical</Badge>
-          </div>
-        </Card>
-        <Card title="Traffic Nodes" icon={<Activity size={18} />} accent="none">
-          <div className="flex items-end justify-between">
-            <div className="text-4xl font-mono font-bold text-cyber-blue-team">28</div>
-            <Badge variant="secondary">Stable</Badge>
-          </div>
-        </Card>
-        <Card title="Evidence Count" icon={<Database size={18} />} accent="forensic">
-          <div className="flex items-end justify-between">
-            <div className="text-4xl font-mono font-bold text-cyber-forensic">104</div>
-            <Badge variant="ev-hashed">Verified</Badge>
-          </div>
-        </Card>
-      </div>
-
-      {/* Module Overview (Asset Integration) */}
-      <div className="space-y-4">
-        <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-          <Cpu size={14} className="text-cyber-primary" /> Integrated Combat Modules
-        </h2>
-        <Card className="p-0 overflow-hidden bg-cyber-surface/30 border-dashed border-cyber-surface-elevated">
-          <div className="flex flex-col md:flex-row items-center gap-8 p-6">
-            <img 
-              src="../renderer/assets/module-grid.png" 
-              alt="System Modules" 
-              className="w-full max-w-2xl h-auto opacity-90 hover:opacity-100 transition-opacity"
-            />
-            <div className="space-y-4 flex-1">
-              <h3 className="text-lg font-mono font-bold text-white uppercase">AI core operational</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                The RangeOS AI infrastructure is currently analyzing 1.2M events/sec. All modules (Forensics, Threat Intel, Sandbox) are reporting healthy status.
-              </p>
-              <div className="flex gap-2">
-                <Badge variant="success">All Systems Nominal</Badge>
-                <Badge variant="ht">Encrypted Link</Badge>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Active Nodes Table */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-              <Server size={14} /> Network Node Registry
+        {/* Main Column */}
+        <div className="lg:col-span-2 space-y-10">
+          <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <LabGalleryWidget labs={data.labs} />
+          </section>
+
+          <section className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <AlertConsoleWidget alerts={data.alerts} />
+          </section>
+
+          {/* Asset Integration Card preserved but styled into the bento */}
+          <section className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 mb-4">
+               <span className="w-2 h-2 rounded-full bg-cyber-primary" /> Integrated Combat Modules
             </h2>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyber-success animate-pulse"></span>
-              <span className="text-[10px] font-mono text-cyber-success uppercase">Live Telemetry</span>
-            </div>
-          </div>
-          <Table headers={tableHeaders} rows={tableRows} />
+            <Card className="p-0 overflow-hidden bg-cyber-surface/30 border-dashed border-cyber-surface-elevated">
+              <div className="flex flex-col md:flex-row items-center gap-8 p-6">
+                <img 
+                  src="../renderer/assets/module-grid.png" 
+                  alt="System Modules" 
+                  className="w-full max-w-sm h-auto opacity-70 hover:opacity-100 transition-opacity rounded-lg"
+                />
+                <div className="space-y-4 flex-1">
+                  <h3 className="text-lg font-mono font-bold text-white uppercase">Neural Link Status</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed font-mono">
+                    All range controllers are operating within predicted efficiency parameters. AI core is successfully intercepting 99.4% of synthetic red-team evasion attempts.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </section>
         </div>
 
-        {/* Mini Topology Preview */}
-        <div className="space-y-4">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-            <Shield size={14} /> Rapid Topology
-          </h2>
-          <Card className="flex-1 min-h-[300px] flex items-center justify-center bg-cyber-background/50">
-            <div className="grid grid-cols-2 gap-x-12 gap-y-8">
-              <TopologyNode label="App Server" ip="10.0.1.5" type="server" />
-              <TopologyNode label="Edge Router" ip="172.16.0.1" type="router" status="loading" />
-              <TopologyNode label="DB Master" ip="10.0.2.20" type="server" />
-              <TopologyNode label="Threat Node" ip="CALI.INFEC" status="alert" type="workstation" />
+        {/* Sidebar Column */}
+        <div className="space-y-10">
+          <section className="animate-in fade-in slide-in-from-right-4 duration-500">
+            <AISuggestionWidget suggestions={data.suggestions} />
+          </section>
+
+          <section className="animate-in fade-in slide-in-from-right-6 duration-700">
+            <EvidenceSummaryWidget cases={data.evidence} />
+          </section>
+
+          {/* Upcoming Approvals Placeholder */}
+          <section className="animate-in fade-in slide-in-from-right-8 duration-1000">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 mb-4">
+              Access Control Queue
+            </h2>
+            <div className="p-8 border border-dashed border-cyber-surface-elevated rounded-lg flex flex-col items-center justify-center text-center space-y-2 group cursor-pointer hover:border-cyber-primary/50 transition-colors">
+              <div className="text-gray-600 group-hover:text-cyber-primary transition-colors">
+                No pending policy overrides
+              </div>
+              <p className="text-[10px] font-mono text-gray-700">All student actions currently within bounds</p>
             </div>
-            <div className="absolute bottom-4 right-4 animate-pulse">
-               <Terminal size={14} className="text-cyber-primary" />
-            </div>
-          </Card>
+          </section>
         </div>
 
       </div>
-
-      {/* System Audit Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setModalOpen(false)} 
-        title="Automated System Audit"
-      >
-        <div className="space-y-4">
-          <p className="text-sm">Initiating full platform diagnostic. This will verify all trust boundaries and lab isolation rules.</p>
-          <div className="p-4 bg-cyber-surface rounded border border-cyber-surface-elevated font-mono text-xs space-y-2">
-            <div className="text-cyber-success">[OK] Root authentication service operational.</div>
-            <div className="text-cyber-success">[OK] P2P Telemetry bus encrypted.</div>
-            <div className="text-cyber-primary">[INFO] Evidence vault synchronization at 94%.</div>
-            <div className="text-cyber-alert">[WARN] Node 172.16.0.1 reporting high latency.</div>
-          </div>
-        </div>
-      </Modal>
-
+      
+      {/* Global Footer Ticker */}
+      <footer className="mt-auto pt-10 pb-4">
+         <div className="bg-cyber-surface/50 border-t border-cyber-surface-elevated p-2 rounded-t-lg">
+            <div className="flex items-center gap-4 text-[9px] font-mono whitespace-nowrap overflow-hidden">
+               <span className="text-cyber-primary font-bold">[SYS/LOG]</span>
+               <div className="flex gap-8 animate-marquee">
+                  <span className="text-gray-500">IDENTITY_SVC: HEARTBEAT_ACK</span>
+                  <span className="text-gray-500">LAB_SVC: POLLING_HYPERVISOR_STATUS_0x291</span>
+                  <span className="text-gray-500">POLICY_SVC: ENFORCEMENT_ACTIVE_DETERMINISTIC</span>
+                  <span className="text-gray-500">GW_SVC: REQUEST_TRACE_b7f65156b6051570</span>
+               </div>
+            </div>
+         </div>
+      </footer>
     </div>
   );
 }
