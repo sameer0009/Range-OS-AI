@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Badge, Button, Table } from '@rangeos/ui';
+import { useForensicsStore } from '../store/ForensicsStore';
 import { 
   Database, 
   Clock, 
@@ -10,24 +11,55 @@ import {
   Plus, 
   History,
   AlertTriangle,
-  FolderOpen
+  FolderOpen,
+  Eye
 } from 'lucide-react';
 
 export default function ForensicsView() {
+  const { activeCase, evidence, updateEvidenceStatus } = useForensicsStore();
   const [activeTab, setActiveTab] = useState<'VAULT' | 'TIMELINE' | 'FINDINGS'>('VAULT');
-  const [selectedCase, setSelectedCase] = useState<any>({
-    id: 'CAS-2026-0042',
-    title: 'Lateral Movement - Subnet B',
-    status: 'ACTIVE',
-    investigator: 'ROOT_ADMIN'
-  });
 
-  const evidenceHeaders = ["Name", "Type", "Source Node", "Size", "Status"];
-  const evidenceRows = [
-    ["srv-dc-mem.raw", <Badge variant="primary">Memory</Badge>, "SRV-DC", "16GB", <Badge variant="ht">VERIFIED</Badge>],
-    ["edge-router.pcap", <Badge variant="primary">Network</Badge>, "ROUTER-01", "512MB", <Badge variant="ht">VERIFIED</Badge>],
-    ["wk-finance-04.vhdx", <Badge variant="primary">Disk</Badge>, "WK-FIN-04", "120GB", <Badge variant="alert" glow>UNVERIFIED</Badge>],
-  ];
+  const handleVerify = async (id: string) => {
+    // In real impl, this calls POST /v1/evidence/{id}/verify
+    setTimeout(() => {
+        updateEvidenceStatus(id, true);
+    }, 1000);
+  };
+
+  const logAccess = async (id: string) => {
+     // Trigger Chain of Custody access log
+     console.log(`[AUDIT] Evidence Access Recorded for artifact ${id}`);
+  };
+
+  const evidenceHeaders = ["Name", "Type", "Source Node", "Size", "Integrity", "Actions"];
+  const evidenceRows = evidence.map(item => [
+    <span className="font-mono text-xs">{item.name}</span>,
+    <Badge variant="primary">{item.type}</Badge>,
+    <span className="text-[10px] font-mono text-gray-400">{item.sourceNode}</span>,
+    <span className="text-[10px] font-mono text-gray-500">{item.size}</span>,
+    <Badge variant={item.is_verified ? 'ht' : 'alert'} glow={!item.is_verified}>
+        {item.is_verified ? 'VERIFIED' : 'PENDING'}
+    </Badge>,
+    <div className="flex gap-2">
+        <Button size="xs" variant="ghost" onClick={() => logAccess(item.id)}>
+            <Eye size={12} />
+        </Button>
+        {!item.is_verified && (
+            <Button size="xs" variant="primary" onClick={() => handleVerify(item.id)}>
+                Verify
+            </Button>
+        )}
+    </div>
+  ]);
+
+  if (!activeCase) {
+    return (
+        <div className="h-full flex flex-col items-center justify-center space-y-4">
+            <Lock size={48} className="text-gray-800" />
+            <p className="font-mono text-xs text-gray-600 uppercase tracking-widest">Select Case context to Unlock Investigative Vault</p>
+        </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-700">
@@ -40,15 +72,17 @@ export default function ForensicsView() {
            </div>
            <div>
               <div className="flex items-center gap-2 mb-1">
-                 <Badge variant="forensic">{selectedCase.id}</Badge>
-                 <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Investigative Lead: {selectedCase.investigator}</span>
+                 <Badge variant="forensic">{activeCase.id}</Badge>
+                 <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Investigative Lead: {activeCase.investigator}</span>
               </div>
-              <h1 className="text-2xl font-mono font-bold text-white uppercase tracking-tight">{selectedCase.title}</h1>
+              <h1 className="text-2xl font-mono font-bold text-white uppercase tracking-tight">{activeCase.title}</h1>
            </div>
         </div>
         <div className="flex gap-3">
-           <Button variant="ghost">Evidence Chain</Button>
-           <Button variant="primary">
+           <Button variant="ghost" className="border-cyber-forensic/20 text-cyber-forensic">
+              <History size={16} className="mr-2" /> Evidence Chain
+           </Button>
+           <Button variant="primary" className="bg-cyber-forensic text-black hover:bg-white shadow-glow-forensic">
               <FileText size={16} className="mr-2" /> Finalize Report
            </Button>
         </div>
