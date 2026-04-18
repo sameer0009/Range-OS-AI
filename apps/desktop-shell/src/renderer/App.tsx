@@ -10,6 +10,7 @@ import ForensicsView from './views/ForensicsView';
 import ReportsCenterView from './views/ReportsCenterView';
 import RedWorkspaceView from './views/RedWorkspaceView';
 import BlueWorkspaceView from './views/BlueWorkspaceView';
+import SettingsView from './views/SettingsView';
 
 
 // Placeholders for views
@@ -41,7 +42,7 @@ function App() {
           <Route path="ai-assistant" element={<AIAssistantView />} />
           <Route path="reports" element={<ReportsCenterView />} />
           <Route path="policies" element={<PlaceholderView title="Policy Console" />} />
-          <Route path="settings" element={<PlaceholderView title="Platform Settings" />} />
+          <Route path="settings" element={<SettingsView />} />
         </Route>
       </Routes>
     </HashRouter>
