@@ -1,0 +1,16 @@
+Package: rangeos-core
+Version: 0.2.31
+Architecture: amd64
+Maintainer: RangeOS AI Project <ops@rangeos.ai>
+Depends: python3.12, python3-pip, python3-venv, postgresql, redis-server, libvirt-daemon-system
+Recommends: rangeos-system, rangeos-assets
+Section: misc
+Priority: optional
+Description: RangeOS AI Backend Microservice Core
+ Installs and configures the full RangeOS AI microservice mesh including
+ lab-service, orchestration-service, forensics-service, reporting-service,
+ ai-service, policy-service, identity-service, telemetry-service,
+ api-gateway, search-service, and update-service.
+ .
+ Python virtualenvs are created per-service. PostgreSQL databases and
+ Redis channels are provisioned during post-install.

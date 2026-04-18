@@ -1,0 +1,11 @@
+Package: rangeos-shell
+Version: 0.2.31
+Architecture: amd64
+Maintainer: RangeOS AI Project <ops@rangeos.ai>
+Depends: rangeos-core, electron, nodejs (>= 20.0)
+Section: misc
+Priority: optional
+Description: RangeOS AI Tactical Desktop Shell
+ Installs the RangeOS AI Electron-based tactical HUD shell.
+ Provides the full multi-workspace interface including Red, Blue,
+ Forensics, AI Assistant, Reports Center and Lab Builder workspaces.

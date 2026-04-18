@@ -1,0 +1,12 @@
+Package: rangeos-system
+Version: 0.2.31
+Architecture: all
+Maintainer: RangeOS AI Project <ops@rangeos.ai>
+Depends: systemd (>= 245), rangeos-core
+Section: misc
+Priority: optional
+Description: RangeOS AI System Integration Layer
+ Installs systemd unit files, session wrapper, preflight validator,
+ and the health provider daemon.
+ Provides system-level and user-level service orchestration for the
+ full RangeOS AI microservice mesh via rangeos-core.target.

@@ -1,0 +1,11 @@
+Package: rangeos-assets
+Version: 0.2.31
+Architecture: all
+Maintainer: RangeOS AI Project <ops@rangeos.ai>
+Depends: kde-plasma-desktop, sddm, fonts-inter
+Section: misc
+Priority: optional
+Description: RangeOS AI Tactical Theme Assets
+ Installs the complete RangeOS AI visual identity system including:
+ KDE color schemes, Kvantum glassmorphism theme, SDDM login skin,
+ desktop wallpapers, and bundled Inter/Roboto Mono typefaces.

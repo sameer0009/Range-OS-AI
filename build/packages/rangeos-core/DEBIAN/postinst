@@ -1,0 +1,129 @@
+#!/bin/bash
+# rangeos-core postinst — Post-installation provisioning script
+# Runs as root after package is unpacked.
+
+set -e
+
+RANGEOS_USER="${SUDO_USER:-rangeos-operator}"
+SERVICES=(
+    lab-service
+    orchestration-service
+    forensics-service
+    reporting-service
+    ai-service
+    policy-service
+    identity-service
+    telemetry-service
+    api-gateway
+    search-service
+    update-service
+)
+
+echo "[RangeOS] ── Starting post-install provisioning ──"
+
+# ── Step 1: System Groups & Permissions ───────────────────────────────────
+echo "[1/7] Creating system groups and filesystem enclaves..."
+groupadd -f rangeos
+groupadd -f forensics
+usermod -aG rangeos,forensics,libvirt "$RANGEOS_USER" 2>/dev/null || true
+
+mkdir -p /opt/rangeos/{bin,services,config}
+mkdir -p /var/lib/rangeos/{labs,evidence,reports,exports}
+mkdir -p /var/log/rangeos
+
+chown -R root:rangeos   /opt/rangeos
+chown -R root:rangeos   /var/log/rangeos
+chown -R root:forensics /var/lib/rangeos/evidence
+chown -R root:libvirt   /var/lib/rangeos/labs
+chown -R root:rangeos   /var/lib/rangeos/reports
+
+chmod -R 750 /opt/rangeos
+chmod -R 750 /var/log/rangeos
+chmod -R 700 /var/lib/rangeos/evidence
+chmod -R 770 /var/lib/rangeos/labs
+chmod -R 750 /var/lib/rangeos/reports
+
+# ── Step 2: PostgreSQL Database Provisioning ──────────────────────────────
+echo "[2/7] Provisioning PostgreSQL databases..."
+systemctl start postgresql 2>/dev/null || true
+sleep 2
+
+sudo -u postgres psql -c "CREATE ROLE rangeos WITH LOGIN PASSWORD 'changeme_in_production';" 2>/dev/null || true
+sudo -u postgres psql -c "CREATE DATABASE rangeos OWNER rangeos;" 2>/dev/null || true
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE rangeos TO rangeos;" 2>/dev/null || true
+
+# ── Step 3: Python Virtualenvs per Service ────────────────────────────────
+echo "[3/7] Bootstrapping Python virtualenvs..."
+for SVC in "${SERVICES[@]}"; do
+    SVC_PATH="/opt/rangeos/services/$SVC"
+    if [ -d "$SVC_PATH" ]; then
+        echo "  → Creating venv for $SVC"
+        python3.12 -m venv "$SVC_PATH/.venv"
+        if [ -f "$SVC_PATH/requirements.txt" ]; then
+            "$SVC_PATH/.venv/bin/pip" install --quiet -r "$SVC_PATH/requirements.txt"
+        fi
+    fi
+done
+
+# ── Step 4: Run Database Migrations ──────────────────────────────────────
+echo "[4/7] Running database schema migrations..."
+for SVC in lab-service forensics-service reporting-service identity-service ai-service; do
+    SVC_PATH="/opt/rangeos/services/$SVC"
+    if [ -f "$SVC_PATH/.venv/bin/alembic" ]; then
+        echo "  → Migrating $SVC"
+        cd "$SVC_PATH" && .venv/bin/alembic upgrade head 2>/dev/null || \
+            .venv/bin/python -c "from app.core.db import create_db_and_tables; create_db_and_tables()"
+    fi
+done
+
+# ── Step 5: Generate Platform Secret ─────────────────────────────────────
+echo "[5/7] Generating platform secret key..."
+ENV_FILE="/etc/rangeos/service-defaults.env"
+mkdir -p /etc/rangeos
+if ! grep -q "SECRET_KEY" "$ENV_FILE" 2>/dev/null; then
+    SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+    cat > "$ENV_FILE" <<EOF
+# RangeOS AI — Service Environment Defaults
+# Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+SECRET_KEY=$SECRET
+DATABASE_URL=postgresql+asyncpg://rangeos:changeme_in_production@localhost/rangeos
+REDIS_URL=redis://localhost:6379/0
+LIBVIRT_URI=qemu:///system
+RANGEOS_ENV=production
+RANGEOS_VERSION=0.2.31
+EOF
+    chmod 640 "$ENV_FILE"
+    chown root:rangeos "$ENV_FILE"
+fi
+
+# ── Step 6: Systemd Unit Installation ────────────────────────────────────
+echo "[6/7] Enabling systemd units..."
+systemctl daemon-reload
+systemctl enable rangeos-core.target 2>/dev/null || true
+systemctl enable rangeos-virt.target 2>/dev/null || true
+
+# Enable user-level units for the operator
+USER_SYSTEMD_DIR="/home/$RANGEOS_USER/.config/systemd/user"
+mkdir -p "$USER_SYSTEMD_DIR"
+for UNIT in /opt/rangeos/system/user-units/*.service; do
+    cp "$UNIT" "$USER_SYSTEMD_DIR/" 2>/dev/null || true
+done
+sudo -u "$RANGEOS_USER" systemctl --user daemon-reload 2>/dev/null || true
+
+# ── Step 7: Install preflight scripts ────────────────────────────────────
+echo "[7/7] Installing CLI tools..."
+install -m 755 /opt/rangeos/scripts/rangeos-preflight    /usr/local/bin/rangeos-preflight
+install -m 755 /opt/rangeos/scripts/rangeos-health-provider /usr/local/bin/rangeos-health-provider
+install -m 755 /opt/rangeos/scripts/rangeos-session-wrapper /usr/local/bin/rangeos-session-wrapper
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  RangeOS AI — Core Installation Complete"
+echo "  Version: 0.2.31-Alpha  |  Target: Noble Numbat"
+echo ""
+echo "  ⚠  IMPORTANT: Update SECRET_KEY in /etc/rangeos/service-defaults.env"
+echo "  ⚠  Run: systemctl start rangeos-core.target"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+exit 0

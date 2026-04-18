@@ -1,0 +1,49 @@
+appId: ai.rangeos.shell
+productName: RangeOS AI
+executableName: rangeos-shell
+copyright: "Copyright © 2026 RangeOS AI Project"
+
+directories:
+  output: dist/packages
+  buildResources: build-assets
+
+files:
+  - "dist/**/*"
+  - "node_modules/**/*"
+  - "package.json"
+
+extraResources:
+  - from: "../../packages/ui-components/dist"
+    to: "ui"
+
+linux:
+  target:
+    - deb
+    - AppImage
+  category: Science
+  icon: build-assets/icon_512x512.png
+  executableArgs:
+    - --no-sandbox
+    - --enable-gpu-rasterization
+  desktop:
+    Name: RangeOS AI Shell
+    Comment: Tactical Cybersecurity Operations Desktop
+    Categories: Science;Security;Education;
+    Keywords: rangeos;cybersecurity;pentest;forensics;
+    StartupWMClass: rangeos-shell
+
+deb:
+  packageName: rangeos-shell
+  priority: optional
+  depends:
+    - "rangeos-core"
+    - "libglib2.0-0"
+    - "libnss3"
+    - "libatk-bridge2.0-0"
+    - "libx11-6"
+    - "libxcomposite1"
+    - "libxdamage1"
+
+afterInstall: scripts/postinstall-shell.sh
+
+publish: null

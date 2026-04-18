@@ -1,0 +1,35 @@
+# ── Noble Forge — Docker Build Container ──────────────────────────────────
+# Provides a reproducible Ubuntu Noble build environment for the Forge
+# pipeline on any host OS (Linux, macOS, Windows/WSL2).
+#
+# Build: docker build -t rangeos-forge -f build/Dockerfile.forge .
+# Run:   docker run --rm --privileged -v $(pwd)/build/dist:/out rangeos-forge
+
+FROM ubuntu:24.04
+
+LABEL maintainer="ops@rangeos.ai"
+LABEL description="RangeOS AI Noble Forge — Reproducible build container"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ── Build Toolchain ──────────────────────────────────────────────────────
+RUN apt update && apt install -y --no-install-recommends \
+    build-essential dpkg-dev \
+    debootstrap squashfs-tools xorriso grub-pc-bin \
+    python3.12 python3-pip python3-venv \
+    curl wget git \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Node.js 20 + pnpm ────────────────────────────────────────────────────
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt install -y nodejs \
+    && npm install -g pnpm electron-builder \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Workspace ────────────────────────────────────────────────────────────
+WORKDIR /workspace
+COPY . .
+
+# ── Build Entrypoint ─────────────────────────────────────────────────────
+ENTRYPOINT ["bash", "build/forge.sh"]
+CMD ["--skip-iso"]
