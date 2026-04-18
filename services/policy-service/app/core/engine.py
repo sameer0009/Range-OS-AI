@@ -1,55 +1,41 @@
-from typing import Dict, List, Optional, Tuple
-from app.models.models import PolicyRule
+from typing import Dict, List, Any
+from ..models.models import PolicyRule
 
-class PolicyEngine:
-    @staticmethod
-    def evaluate(rules: List[PolicyRule], context: Dict) -> Tuple[str, str, Optional[PolicyRule]]:
+class TacticalRuleEngine:
+    def __init__(self, rules: List[PolicyRule]):
+        # Higher priority (lower number) evaluated first
+        self.rules = sorted(rules, key=lambda r: r.priority)
+
+    def evaluate(self, context: Dict[str, Any]) -> str:
         """
-        Deterministic Deny-Override evaluation.
-        Returns: (Decision, Reason, Rule)
+        Evaluates a set of rules against the provided context.
+        Strategy: Deny-Override / Closed-World (Default Deny)
         """
-        # 1. Deny check (Highest priority)
-        for rule in rules:
-            if rule.effect == "DENY" and PolicyEngine._matches(rule.condition_json, context):
-                return "DENIED", f"Action restricted by policy rule: {rule.action_type}", rule
-        
-        # 2. Approval check
-        for rule in rules:
-            if rule.effect == "APPROVAL_REQUIRED" and PolicyEngine._matches(rule.condition_json, context):
-                return "APPROVAL_REQUIRED", "Administrator approval required for this action", rule
+        final_decision = "DENIED" # Default if no rules match
 
-        # 3. Allow check
-        for rule in rules:
-            if rule.effect == "ALLOW" and PolicyEngine._matches(rule.condition_json, context):
-                return "ALLOWED", "Action permitted by policy", rule
+        for rule in self.rules:
+            if self._matches_conditions(rule.condition_json, context):
+                effect = rule.effect.upper()
+                
+                if effect == "DENY":
+                    return "DENIED" # Instant Deny override
+                
+                if effect == "ALLOW":
+                    final_decision = "ALLOWED"
+                
+                if effect == "APPROVAL_REQUIRED":
+                    # Only upgrade to approval if not already allowed
+                    if final_decision != "ALLOWED":
+                        final_decision = "APPROVAL_REQUIRED"
 
-        # 4. Default fallback
-        return "DENIED", "No matching policy rule found (Secure by Default)", None
+        return final_decision
 
-    @staticmethod
-    def _matches(condition: Dict, context: Dict) -> bool:
+    def _matches_conditions(self, conditions: Dict[str, Any], context: Dict[str, Any]) -> bool:
         """
-        Simple atomic condition matcher.
-        Supports: lte, gte, eq, neq
+        Simple attribute matching. 
+        Supports equality checks for all keys in condition_json.
         """
-        if not condition:
-            return True
-        
-        field = condition.get("field")
-        operator = condition.get("operator")
-        required_value = condition.get("value")
-        
-        # Basic context traversal (e.g. "resource.node_count")
-        current_val = context
-        try:
-            for part in field.split('.'):
-                current_val = current_val.get(part)
-        except (AttributeError, TypeError):
-            return False
-
-        if operator == "lte": return current_val <= required_value
-        if operator == "gte": return current_val >= required_value
-        if operator == "eq": return current_val == required_value
-        if operator == "neq": return current_val != required_value
-        
-        return False
+        for key, value in conditions.items():
+            if key not in context or context[key] != value:
+                return False
+        return True
