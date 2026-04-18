@@ -25,8 +25,13 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True, max_length=100)
     hashed_password: str = Field(max_length=255)
     full_name: Optional[str] = Field(default=None, max_length=100)
+    
+    # Account Protection
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
+    failed_login_attempts: int = Field(default=0)
+    locked_until: Optional[datetime] = Field(default=None)
+    
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), sa_column_kwargs={"onupdate": lambda: datetime.now(timezone.utc)})
     
@@ -38,11 +43,11 @@ class Session(SQLModel, table=True):
     __tablename__ = "sessions"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="users.id")
-    session_key: str = Field(unique=True, index=True)
+    refresh_token_id: uuid.UUID = Field(default_factory=uuid.uuid4, unique=True, index=True)
     expires_at: datetime
     ip_address: Optional[str] = Field(default=None, max_length=45)
     user_agent: Optional[str] = Field(default=None, max_length=255)
-    is_active: bool = Field(default=True)
+    is_revoked: bool = Field(default=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     user: User = Relationship(back_populates="sessions")
