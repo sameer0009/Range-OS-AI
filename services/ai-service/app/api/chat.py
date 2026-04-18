@@ -1,63 +1,62 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
 from typing import List, Optional, Dict
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from ..models.models import AIInteraction, RANGE_OS_PERSONAS
 import structlog
-import random
 
 logger = structlog.get_logger()
 router = APIRouter()
 
 class ChatRequest(BaseModel):
-    message: str
-    agent_id: str
-    context: Optional[Dict] = None
+    mission_id: str
+    profile_id: str
+    prompt: str
+    include_telemetry: bool = True
 
 class Suggestion(BaseModel):
-    id: str
-    label: str
-    action: str
-    type: str
+    type: str # CMD_OFFENSIVE, CMD_DEFENSIVE, FORENSIC_PIVOT
+    command: str
+    reason: str
 
 class ChatResponse(BaseModel):
-    response: str
+    content: str
     suggestions: List[Suggestion]
-    metadata: Dict
-
-MOCK_CYBER_FACTS = [
-    "The target DC is running a legacy version of the Print Spooler service, potentially vulnerable to PrintNightmare.",
-    "Network telemetry shows unusual outbound traffic on port 4444, which matches common Metasploit stagers.",
-    "The policy engine has flagged this subnet as 'High Containment', meaning all internet-bound packets are being dropped.",
-    "Analyst intelligence suggests the presence of a persistent back-door in the edge router's firmware."
-]
+    grounded: bool = True
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat_interaction(request: ChatRequest):
-    await logger.info("ai_interaction_request", 
-                 agent=request.agent_id, 
-                 msg_len=len(request.message))
+async def tactical_chat(req: ChatRequest):
+    # 1. Select Persona
+    persona = RANGE_OS_PERSONAS.get(req.profile_id.upper())
+    if not persona:
+        raise HTTPException(status_code=404, detail="PERSONA_NOT_FOUND")
 
-    # Determine mock response based on agent
-    fact = random.choice(MOCK_CYBER_FACTS)
-    
-    response_text = f"As the {request.agent_id.capitalize()} agent, I've analyzed your request. {fact} How would you like to proceed?"
+    await logger.info("ai_chat_request", mission_id=req.mission_id, profile=persona.name)
+
+    # 2. Context Harvesting (STUB - In real impl, call telemetry-service and lab-service)
+    context = {
+        "lab_status": "ACTIVE",
+        "nodes": ["kali-red-01", "ubuntu-target"],
+        "recent_alerts": 2
+    }
+
+    # 3. LLM Orchestration (STUB - In real impl, call Google Gemini / Local LLM)
+    response_text = f"As the {persona.name}, I've analyzed the mission context. You should perform reconnaissance on 10.0.10.20."
     
     suggestions = [
-        {
-            "id": "sug-1",
-            "label": "ISOLATE SEGMENT",
-            "action": f"isolate --id {request.context.get('lab_id', 'LAB-1') if request.context else 'LAB-1'}",
-            "type": "policy_change"
-        },
-        {
-            "id": "sug-2",
-            "label": "INITIALIZE SNAPSHOT",
-            "action": "snapshot create --all",
-            "type": "lab_action"
-        }
+        Suggestion(
+            type="CMD_OFFENSIVE",
+            command="nmap -sV 10.0.10.20",
+            reason="Verify target service availability."
+        )
     ]
 
-    return {
-        "response": response_text,
-        "suggestions": suggestions,
-        "metadata": {"engine": "Mock-Neural-v4", "latency": "42ms"}
-    }
+    # 4. Persistence would happen here
+    
+    return ChatResponse(
+        content=response_text,
+        suggestions=suggestions
+    )
+
+@router.get("/profiles")
+def list_profiles():
+    return [p.dict() for p in RANGE_OS_PERSONAS.values()]
