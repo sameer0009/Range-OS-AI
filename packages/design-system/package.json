@@ -1,0 +1,9 @@
+{
+  "name": "@rangeos/design-system",
+  "version": "0.0.0",
+  "private": true,
+  "main": "tailwind.config.js",
+  "dependencies": {
+    "tailwindcss": "^3.4.3"
+  }
+}
