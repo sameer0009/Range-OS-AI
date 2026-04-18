@@ -1,0 +1,50 @@
+:root {
+  /* Core Base Colors */
+  --rangeos-bg: #020617;
+  --rangeos-surface: rgba(15, 23, 42, 0.75);
+  --rangeos-surface-border: rgba(56, 189, 248, 0.2);
+  
+  /* Tactical Palette */
+  --rangeos-primary: #0ea5e9;
+  --rangeos-primary-glow: rgba(14, 165, 233, 0.4);
+  --rangeos-secondary: #0d9488;
+  --rangeos-neural: #6366f1;
+  
+  /* Status & Triage */
+  --rangeos-alert: #ef4444;
+  --rangeos-forensics: #f59e0b;
+  --rangeos-success: #10b981;
+  --rangeos-neutral: #94a3b8;
+  
+  /* Trust Zones */
+  --rangeos-zone-red: #f87171;
+  --rangeos-zone-blue: #60a5fa;
+  --rangeos-zone-green: #34d399;
+  --rangeos-zone-gray: #94a3b8;
+  
+  /* Effects */
+  --rangeos-glass-blur: blur(16px);
+  --rangeos-shadow-tactical: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  
+  /* Typography */
+  --rangeos-font-sans: 'Inter', system-ui, sans-serif;
+  --rangeos-font-mono: 'Roboto Mono', monospace;
+}
+
+.tactical-glass {
+  background: var(--rangeos-surface);
+  backdrop-filter: var(--rangeos-glass-blur);
+  border: 1px solid var(--rangeos-surface-border);
+  box-shadow: var(--rangeos-shadow-tactical);
+  border-radius: 12px;
+}
+
+.glow-primary {
+  box-shadow: 0 0 15px var(--rangeos-primary-glow);
+}
+
+.font-tactical {
+  font-family: var(--rangeos-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
