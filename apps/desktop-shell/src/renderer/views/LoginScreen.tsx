@@ -21,17 +21,23 @@ export default function LoginScreen() {
   return (
     <div className="flex flex-col h-screen w-screen bg-cyber-background items-center justify-center p-6 select-none relative overflow-hidden">
       
-      {/* Background Grid/Matrix effect placeholder */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(#00E5FF_1px,transparent_1px)] [background-size:40px_40px]"></div>
+      {/* High-Fidelity Background Grid Asset */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img 
+          src="../renderer/assets/hero-bg.png" 
+          className="w-full h-full object-cover opacity-60 scale-105 animate-pulse-slow font-mono"
+          alt="System Grid"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-cyber-background/80 via-transparent to-cyber-background/90" />
       </div>
 
       {/* Top Left Branding */}
-      <div className="absolute top-8 left-8 flex items-center gap-3">
-        <Shield size={24} className="text-cyber-primary" />
-        <span className="font-mono text-lg font-bold tracking-[0.2em] text-white">
-          RANGE<span className="text-cyber-primary">OS</span> AI
-        </span>
+      <div className="absolute top-8 left-8 flex items-center gap-3 z-20">
+        <img 
+          src="../renderer/assets/logo-text.png" 
+          alt="RANGE OS AI" 
+          className="h-8 w-auto opacity-90 transition-opacity hover:opacity-100"
+        />
       </div>
 
       {/* Login Card */}

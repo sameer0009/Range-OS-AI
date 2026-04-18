@@ -26,19 +26,24 @@ export default function SplashScreen() {
     <div className="flex flex-col h-screen w-screen bg-cyber-background items-center justify-center p-8 select-none" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
       <div className="max-w-md w-full space-y-8 flex flex-col items-center">
         
-        {/* Animated Icon */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-cyber-primary blur-xl opacity-20 rounded-full animate-pulse"></div>
-          <Terminal size={80} className="text-cyber-primary relative z-10" />
-        </div>
-
-        {/* Brand */}
-        <div className="text-center space-y-2">
-          <h1 className="text-5xl font-mono font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary to-cyber-secondary">
-            RANGE_OS
-          </h1>
-          <p className="text-gray-400 font-mono text-sm tracking-widest animate-pulse">
-            INITIALIZING SUBSYSTEMS...
+        {/* High-Quality Brand Identity Assets */}
+        <div className="relative flex flex-col items-center gap-6">
+          <div className="absolute -inset-10 bg-cyber-primary blur-[100px] opacity-10 animate-pulse"></div>
+          
+          <img 
+            src="../renderer/assets/splash-loading.png" 
+            alt="RangeOS Logo" 
+            className="w-48 h-auto relative z-10 animate-in zoom-in duration-1000"
+          />
+          
+          <img 
+            src="../renderer/assets/logo-text.png" 
+            alt="RANGE OS AI" 
+            className="w-80 h-auto relative z-10"
+          />
+          
+          <p className="text-cyber-primary font-mono text-[10px] tracking-[0.5em] uppercase opacity-60 animate-pulse">
+            Secure · Intelligent · Controlled
           </p>
         </div>
 

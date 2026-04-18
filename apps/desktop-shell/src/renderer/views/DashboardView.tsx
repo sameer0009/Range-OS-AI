@@ -75,6 +75,32 @@ export default function DashboardView() {
         </Card>
       </div>
 
+      {/* Module Overview (Asset Integration) */}
+      <div className="space-y-4">
+        <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+          <Cpu size={14} className="text-cyber-primary" /> Integrated Combat Modules
+        </h2>
+        <Card className="p-0 overflow-hidden bg-cyber-surface/30 border-dashed border-cyber-surface-elevated">
+          <div className="flex flex-col md:flex-row items-center gap-8 p-6">
+            <img 
+              src="../renderer/assets/module-grid.png" 
+              alt="System Modules" 
+              className="w-full max-w-2xl h-auto opacity-90 hover:opacity-100 transition-opacity"
+            />
+            <div className="space-y-4 flex-1">
+              <h3 className="text-lg font-mono font-bold text-white uppercase">AI core operational</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                The RangeOS AI infrastructure is currently analyzing 1.2M events/sec. All modules (Forensics, Threat Intel, Sandbox) are reporting healthy status.
+              </p>
+              <div className="flex gap-2">
+                <Badge variant="success">All Systems Nominal</Badge>
+                <Badge variant="ht">Encrypted Link</Badge>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Active Nodes Table */}
