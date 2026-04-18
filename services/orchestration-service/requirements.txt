@@ -4,3 +4,5 @@ pydantic
 pydantic-settings
 structlog
 pytest
+libvirt-python
+jinja2
